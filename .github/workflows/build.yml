@@ -1,0 +1,23 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - run: cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build
+      - run: ctest --test-dir build --output-on-failure
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build
+      - run: ctest --test-dir build --output-on-failure
