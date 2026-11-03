@@ -16,6 +16,9 @@ extracting whole archives:
 - Nothing throws. Every call returns a `Status`. Truncated, hostile or
   corrupt input is a status, never a crash. On Windows, a mapping whose
   backing file vanished mid-read reports `IoError` instead of faulting.
+- Header counts are capped (65,536 folders, 2,097,152 files; the largest
+  shipped archives have 1,700 and 75,408) so open() never allocates more
+  than a few megabytes whatever the file claims.
 - The file is opened with share read/write/delete so mod managers can keep
   working while it is open.
 - zlib and LZ4-frame decoders are built in, bounds-checked, and write into a
