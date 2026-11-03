@@ -48,6 +48,12 @@ constexpr uint64_t kFileRecordSize = 16;
 constexpr uint32_t kSizeCompressToggle = 0x40000000u;
 constexpr uint32_t kSizeMask = 0x3FFFFFFFu;
 
+// Hard ceilings on header counts, so a hostile file cannot make open()
+// allocate in proportion to its size. The largest shipped archives have
+// 1,700 folders and 75,408 files; these are 38x and 27x that.
+constexpr uint32_t kMaxFolders = 65536;
+constexpr uint32_t kMaxFiles = 2097152;
+
 inline uint32_t rd32(const uint8_t* p) noexcept {
     return uint32_t{p[0]} | (uint32_t{p[1]} << 8) | (uint32_t{p[2]} << 16) | (uint32_t{p[3]} << 24);
 }
@@ -173,6 +179,7 @@ struct Reader::Impl {
         hdr.fileFlags = rd32(d + 32);
         hdr.archiveSize = size;
         if (has(archive_flags::Xbox360)) return Status::Unsupported;
+        if (hdr.folderCount > kMaxFolders || hdr.fileCount > kMaxFiles) return Status::Corrupt;
 
         const uint64_t recSize = hdr.version == 105 ? 24 : 16;
         if (folderRecordOffset > size || hdr.folderCount > (size - folderRecordOffset) / recSize) return Status::Corrupt;
