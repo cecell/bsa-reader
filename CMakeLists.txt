@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)  # PROJECT_IS_TOP_LEVEL
 project(bsa_reader VERSION 0.1.0 LANGUAGES CXX)
 
 option(BSA_READER_BUILD_TOOLS "Build the bsatool command line program" ${PROJECT_IS_TOP_LEVEL})
