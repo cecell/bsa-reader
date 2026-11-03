@@ -6,6 +6,11 @@
 // never touch the name tables and never allocate. Names are decoded only when
 // asked for. Nothing here throws; every call returns a Status.
 //
+// Threading: after open() returns, every const method may be called from any
+// number of threads at once (the mapping is immutable and has no cursor).
+// open() and close() are not safe to overlap with other calls on the same
+// Reader.
+//
 // SPDX-License-Identifier: GPL-3.0-only
 #pragma once
 

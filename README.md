@@ -56,7 +56,41 @@ Keep readers short-lived. Windows refuses to truncate a file that has a
 mapping open (renames and deletes still work), so a long-lived reader can
 block a tool that rewrites an archive in place.
 
-CMake: `add_subdirectory` or `FetchContent` this repo and link `bsa::reader`.
+Threading: once `open()` has returned, all const methods are safe to call
+from any number of threads at once. `open()`/`close()` must not overlap with
+other calls on the same `Reader`.
+
+## Integrating
+
+Pin a tag and link the target; the library inherits the consumer's runtime
+and warning flags, builds no tools or tests when it is not the top-level
+project, and needs nothing else.
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(bsa_reader
+    GIT_REPOSITORY https://github.com/cecell/bsa-reader.git
+    GIT_TAG v0.1.0)
+FetchContent_MakeAvailable(bsa_reader)
+target_link_libraries(your_target PRIVATE bsa::reader)
+```
+
+A git submodule plus `add_subdirectory(third_party/bsa-reader)` works the
+same way. Typical calls for a one-shot lookup:
+
+```cpp
+bsa::Reader r;
+if (r.open(bsaPath) == bsa::Status::Ok) {          // short-lived: open, ask, close
+    bsa::Entry e;
+    if (r.find("strings\\plugin_english.strings", e) == bsa::Status::Ok)
+        r.read(e, bytes, 64u << 20);               // decompresses; refuses > 64 MiB
+}
+uint32_t fileCount = r.header().fileCount;         // header only, no table walk needed
+```
+
+Statuses a caller usually wants to tell apart: `NotFound` (fine, try the next
+archive), `NotBsa`/`UnsupportedVersion`/`Unsupported` (skip the file),
+`Corrupt` (report it), everything else (treat as a failed read).
 
 ## bsatool
 
