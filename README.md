@@ -116,13 +116,21 @@ Verified against the shipped Skyrim SE and Oblivion archives:
   stream (v103/v104) or an LZ4 *frame* (v105, magic `04 22 4D 18`).
 - Hash: `hash1 = last | second_last << 8 | len << 16 | first << 24`, then
   **XOR** `0x80` for `.kf`, `0x8000` for `.nif`, `0x8080` for `.dds`,
-  `0x80000000` for `.wav`; high 32 bits are `sdbm(stem[1..len-3]) + sdbm(ext)`
-  with `h = h * 0x1003F + c`. ASCII letters are lowercased, `/` becomes `\`,
-  bytes above 0x7F pass through unchanged and unsigned. Public descriptions
-  say OR for the marker; that is only equivalent for ASCII names, and
-  third-party SSE archives with non-ASCII names show the packers XOR. v103 is
-  believed to treat high bytes as signed in the sums (per xEdit); the shipped
-  Oblivion archives have no such names, so that is unverified.
+  `0x80000000` for `.wav`, `0x80008000` for `.adp`; high 32 bits are
+  `sdbm(stem[1..len-3]) + sdbm(ext)` with `h = h * 0x1003F + c`. ASCII letters
+  are lowercased, `/` becomes `\`, bytes above 0x7F pass through unchanged and
+  unsigned. Public descriptions say OR for the marker; that is only equivalent
+  for ASCII names, and third-party SSE archives with non-ASCII names show the
+  packers XOR. v103 is believed to treat high bytes as signed in the sums (per
+  xEdit); the shipped Oblivion archives have no such names, so that is
+  unverified.
+- The marker test reads only the first four bytes of the extension, terminator
+  included, so `.nifx`, `.ddsx`, `.wavx` and `.adpx` get the marker and `.kfx`
+  does not. A name with an empty stem (`.nif`) hashes to 0 whatever its
+  extension. Archive.exe, the Creation Kit and the game share these rules, but
+  no shipped archive holds such a name, so `bsatool check` cannot guard them:
+  the unit tests do, with hashes measured from Archive.exe. Applied to v103 too,
+  unverified there.
 
 ## Bethesda's packer
 

@@ -172,20 +172,20 @@ byte `0x49` (`0xC9 + 0x80`, wrapped), and `péé.dds` has last-character byte `0
 Under the XOR rule, all nine non-ASCII names in that run match except the `.adp` one,
 which fails only because of the marker covered below.
 
-**The rest of it, where bsa-reader differs today.** The Kit has the same marker
-table and the same hash code (Kit `142629a20`, table at `14393cf28`). The game has the
-same table (1.6.1170, `140cff990`, table at `142029ba8`). These are real differences in bsa-reader's
-`hash.cpp`, though no archive in the corpus exposes them:
+**The rest of it.** The Kit has the same marker table and the same hash code (Kit
+`142629a20`, table at `14393cf28`). The game has the same table (1.6.1170, `140cff990`,
+table at `142029ba8`). bsa-reader's `hash.cpp` follows these rules too:
 
-- **`.adp` has a marker.** bsa-reader has none.
+- **`.adp` has a marker.**
 - **Only the first four bytes of the extension are compared**, so `.nifx`, `.ddsx`,
   `.wavx` and `.adpx` get the marker too. `.kfx` does not, because `.kf` needs its
-  terminator. bsa-reader compares the whole extension.
+  terminator.
 - **A name with an empty stem hashes to 0**, whatever the extension (`.nif`,
   `.gitignore`).
 
-The corpus has no `.adp` files and no such names, which is why `bsatool check`
-reports 0 mismatches over all 664,272 files.
+The corpus has no `.adp` files and no such names, so `bsatool check` reports 0
+mismatches over all 664,272 files with or without these rules. Unit tests guard them
+instead, with hashes measured from Archive.exe.
 
 Separately, an extension of 15 or more letters also gives hash 0 in Archive.exe. That
 comes from a 16-byte buffer in its path splitting (`140023ef0`), so it may be

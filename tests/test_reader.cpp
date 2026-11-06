@@ -297,6 +297,37 @@ static void test_hash_vectors() {
     // (only the middle of the stem and the extension feed the signed sums)
     CHECK(bsa::hash_file("ca\xE9" "fe.nif", 103) != bsa::hash_file("ca\xE9" "fe.nif", 104));
     CHECK(bsa::hash_file("cafe.nif", 103) == bsa::hash_file("cafe.nif", 104));
+
+    // Measured from real Archive.exe output. No archive in the corpus holds these
+    // names, so bsatool check cannot guard them.
+    static const struct {
+        const char* file;
+        uint64_t hash;
+    } measured[] = {
+        {"a.nif", 0x92CD45FD61018061ULL},
+        {"a.kf", 0x1711E3E9610100E1ULL},
+        // .adp has a marker.
+        {"a.adp", 0x8C617B3FE1018061ULL},
+        // Only the first four bytes of the extension pick the marker...
+        {"a.nifx", 0x668139BB61018061ULL},
+        {"a.ddsx", 0x92D3C7F3610180E1ULL},
+        {"a.wavx", 0x055E185AE1010061ULL},
+        {"a.adpx", 0x073C54F9E1018061ULL},
+        // ...and the terminator of .kf is one of them.
+        {"a.kfx", 0x915016CF61010061ULL},
+        // An empty stem hashes to 0, marker or not.
+        {".nif", 0},
+        {".dds", 0},
+        {".txt", 0},
+    };
+    for (const auto& t : measured) {
+        CHECK(bsa::hash_file(t.file, 104) == t.hash);
+        CHECK(bsa::hash_file(t.file, 105) == t.hash);
+    }
+    // The marker test sees normalised bytes, like the rest of the hash.
+    CHECK(bsa::hash_file("A.ADP") == 0x8C617B3FE1018061ULL);
+    CHECK(bsa::hash_file("A.NIFX") == 0x668139BB61018061ULL);
+    CHECK(bsa::hash_file("A.KF") == 0x1711E3E9610100E1ULL);
 }
 
 static void test_roundtrip(uint32_t version, uint32_t flags) {
