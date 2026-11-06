@@ -124,6 +124,13 @@ Verified against the shipped Skyrim SE and Oblivion archives:
   believed to treat high bytes as signed in the sums (per xEdit); the shipped
   Oblivion archives have no such names, so that is unverified.
 
+## Bethesda's packer
+
+[docs/ARCHIVE_EXE.md](docs/ARCHIVE_EXE.md) catalogs what `Archive.exe` does and
+where it goes wrong: how it picks compression and builds an archive, the hash it
+computes, the bugs and traps for mod authors (including what its "save crash"
+really is), and how to tell its archives from BSArch's and CAO's.
+
 ## Build
 
 Windows: `build.cmd` (MSVC 14.44 + Ninja). Anywhere: `cmake -B build &&
