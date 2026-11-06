@@ -139,6 +139,12 @@ where it goes wrong: how it picks compression and builds an archive, the hash it
 computes, the bugs and traps for mod authors (including what its "save crash"
 really is), and how to tell its archives from BSArch's and CAO's.
 
+## Credits
+
+The inflate code in `src/inflate.cpp` is altered from puff, by Mark Adler, part
+of the [zlib](https://github.com/madler/zlib) distribution. Its notice is in that
+file. The LZ4 decoder follows the LZ4 frame format specification by Yann Collet.
+
 ## Build
 
 Windows: `build.cmd` (MSVC 14.44 + Ninja). Anywhere: `cmake -B build &&
