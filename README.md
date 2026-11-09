@@ -132,13 +132,6 @@ Verified against the shipped Skyrim SE and Oblivion archives:
   the unit tests do, with hashes measured from Archive.exe. Applied to v103 too,
   unverified there.
 
-## Bethesda's packer
-
-[docs/ARCHIVE_EXE.md](docs/ARCHIVE_EXE.md) catalogs what `Archive.exe` does and
-where it goes wrong: how it picks compression and builds an archive, the hash it
-computes, the bugs and traps for mod authors (including what its "save crash"
-really is), and how to tell its archives from BSArch's and CAO's.
-
 ## Credits
 
 The inflate code in `src/inflate.cpp` is altered from puff, by Mark Adler, part
